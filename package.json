@@ -1,12 +1,16 @@
 {
-  "name": "mikro",
-  "version": "1.0.0",
-  "description": "",
+  "name": "@flexwie/mikro",
+  "version": "0.0.1",
+  "description": "True microservices framework for nodeJs ",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "directory": "mikro",
+    "url": "https://github.com/fosscom/mikro"
+  }
 }
