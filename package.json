@@ -4,7 +4,8 @@
   "description": "True microservices framework for nodeJs ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -12,5 +13,8 @@
   "repository": {
     "directory": "mikro",
     "url": "https://github.com/fosscom/mikro"
+  },
+  "devDependencies": {
+    "typescript": "^4.1.3"
   }
 }
