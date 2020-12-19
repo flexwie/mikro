@@ -35,6 +35,12 @@ mikro.register()
 
 ```
 
+You can use the included CLI to quickly create a boilerplate. For more information see the [CLI Readme](/cli).
+
+```
+npx @flexwie/mikro new service_name
+```
+
 `mikro` will automatically send heath metrics to the registry in the background. You can then use `mikro`s functions to help with your service. See detailed information below.
 
 ### EventStream
