@@ -1,13 +1,13 @@
 {
   "name": "@flexwie/mikro",
-  "version": "0.0.1",
+  "version": "0.0.2-alpha.1.0",
   "description": "True microservices framework for nodeJs ",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "test": "jest --config jestconfig.json",
     "build": "tsc",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
@@ -40,6 +40,9 @@
   "files": [
     "lib/**/*"
   ],
+  "bin": {
+    "mikro": "./cli/index.js"
+  },
   "dependencies": {
     "ioredis": "^4.19.4",
     "unique-names-generator": "^4.3.1",
