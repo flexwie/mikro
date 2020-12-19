@@ -34,7 +34,7 @@ export default class KafkaEventStream implements IEventStream {
                     } else {
                         throw new Error(`Couldn't find callback for this event: ${topic}`)
                     }
-                    
+
                     resolve()
                 } catch (error) {
                     reject(error)
@@ -85,7 +85,7 @@ export default class KafkaEventStream implements IEventStream {
    * @param eventName Event to be unsubscribed
    */
   unsubscribe = (eventName: string): void => {
-    this.SubscriberClient.unsubscribe(eventName)
+    console.info("KafkaJS has no unsubscribe function so far")
     this.listener.delete(eventName)
   }
 
@@ -95,6 +95,6 @@ export default class KafkaEventStream implements IEventStream {
    * @param instanceData Health telemetry
    */
   health = (instanceData: IHealthData): void => {
-    this.PublisherClient.publish('+health', JSON.stringify(instanceData))
+    this.PublisherClient.send({topic: '+health', messages:[ {value: JSON.stringify(instanceData)} ]})
   }
 }
