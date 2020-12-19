@@ -2,7 +2,7 @@
 
 ![npm (scoped)](https://img.shields.io/npm/v/@flexwie/mikro)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/fosscom/mikro)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fosscom/mikro/test?label=tests)
+![Tests](https://github.com/fosscom/mikro/workflows/Tests/badge.svg)
 
 `mikro` aims to simplyfy developing microservices on nodejs by taking away the need to configure infrastructure. Simply write services with the framework and deploy them by ejecting the infrastructure for use with Docker or K8s. Read more on how to deploy `mikro` at [Deployment]('#deployment').
 
