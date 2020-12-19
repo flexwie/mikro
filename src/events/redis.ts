@@ -19,7 +19,7 @@ export default class RedisEventStream implements IEventStream {
         this.PublisherClient = new RedisClient(options)
 
         this.SubscriberClient.on("message", (channel, message) => {
-            let callback = this.listener.get(channel)
+            const callback = this.listener.get(channel)
             if (callback) { callback(null, JSON.parse(message)) } else { throw new Error(`Couldn't find callback for this event: ${channel}`) }
         })
     }
@@ -31,7 +31,7 @@ export default class RedisEventStream implements IEventStream {
      * @param data Data to be published
      */
     publish = (eventName: string, data: IEventData): void => {
-        if(eventName.charAt(0) == "+") {
+        if(eventName.charAt(0) === "+") {
             throw new PubSubError('Events starting with + are reserved for system communication')
         }
         this.PublisherClient.publish(eventName, JSON.stringify(data))
@@ -44,7 +44,7 @@ export default class RedisEventStream implements IEventStream {
      * @param callback Function to execute
      */
     subscribe = (eventName: string, callback: eventCallback): void => {
-        if(eventName.charAt(0) == '+') {
+        if(eventName.charAt(0) === '+') {
             throw new PubSubError('Events starting with + are reserved for system communication and should not be accessed.')
         }
         this.SubscriberClient.subscribe(eventName)

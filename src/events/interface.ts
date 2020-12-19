@@ -9,7 +9,7 @@ export type eventCallback = (error: Error | null, data: IEventData) => void
 export interface IEventData {
     emitterName: string,
     timestamp: number,
-    data: Object
+    data: object
 }
 
 /**
