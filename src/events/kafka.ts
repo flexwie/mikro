@@ -14,7 +14,7 @@ export default class KafkaEventStream implements IEventStream {
    * @class
    * @param options Redis configuration
    */
-  constructor(options: KafkaConfig, ) {
+  constructor(options: KafkaConfig) {
     this.kafka = new Kafka(options)
 
     this.SubscriberClient = this.kafka.consumer()
@@ -24,23 +24,23 @@ export default class KafkaEventStream implements IEventStream {
     this.PublisherClient.connect()
 
     this.SubscriberClient.run({
-        eachMessage: ({topic, message}): Promise<void> => {
-            return new Promise((resolve, reject) => {
-                try {
-                    const cb = this.listener.get(topic)
+      eachMessage: ({ topic, message }): Promise<void> => {
+        return new Promise((resolve, reject) => {
+          try {
+            const cb = this.listener.get(topic)
 
-                    if (cb) {
-                        cb(null, JSON.parse(message.value?.toString() as string))
-                    } else {
-                        throw new Error(`Couldn't find callback for this event: ${topic}`)
-                    }
+            if (cb) {
+              cb(null, JSON.parse(message.value?.toString() as string))
+            } else {
+              throw new Error(`Couldn't find callback for this event: ${topic}`)
+            }
 
-                    resolve()
-                } catch (error) {
-                    reject(error)
-                }
-            })
-        }
+            resolve()
+          } catch (error) {
+            reject(error)
+          }
+        })
+      },
     })
   }
 
@@ -55,10 +55,8 @@ export default class KafkaEventStream implements IEventStream {
       throw new PubSubError('Events starting with + are reserved for system communication')
     }
     this.PublisherClient.send({
-        topic: eventName,
-        messages: [
-            { value: JSON.stringify(data)}
-        ]
+      topic: eventName,
+      messages: [{ value: JSON.stringify(data) }],
     })
   }
 
@@ -73,9 +71,9 @@ export default class KafkaEventStream implements IEventStream {
       throw new PubSubError('Events starting with + are reserved for system communication and should not be accessed.')
     }
     this.SubscriberClient.subscribe({
-        topic: eventName
+      topic: eventName,
     })
-    
+
     this.listener.set(eventName, callback)
   }
 
@@ -86,7 +84,7 @@ export default class KafkaEventStream implements IEventStream {
    */
   unsubscribe = (eventName: string): void => {
     // eslint-disable-next-line no-console
-    console.log("KafkaJS has no unsubscribe function so far")
+    console.log('KafkaJS has no unsubscribe function so far')
     this.listener.delete(eventName)
   }
 
@@ -96,6 +94,6 @@ export default class KafkaEventStream implements IEventStream {
    * @param instanceData Health telemetry
    */
   health = (instanceData: IHealthData): void => {
-    this.PublisherClient.send({topic: '+health', messages:[ {value: JSON.stringify(instanceData)} ]})
+    this.PublisherClient.send({ topic: '+health', messages: [{ value: JSON.stringify(instanceData) }] })
   }
 }

@@ -6,7 +6,7 @@ import { RedisEventStream } from './events'
 import IEventStream from './events/interface'
 
 export interface IMikroOptions {
-    eventStream: IEventStream
+  eventStream: IEventStream
 }
 
 export default class Mikro {
@@ -59,12 +59,12 @@ export default class Mikro {
    */
   register() {
     this.logging.log('info', `Service created with name ${this.instanceName}`)
-    this.healthTimer = setInterval(() => {
+    this.healthTimer = (setInterval(() => {
       this.events.health({
         instanceName: this.instanceName,
         serviceName: this.serviceName,
       })
-    }, 1000) as unknown as NodeJS.Timeout
+    }, 1000) as unknown) as NodeJS.Timeout
   }
 
   /**
