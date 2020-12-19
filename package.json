@@ -1,6 +1,6 @@
 {
   "name": "@flexwie/mikro",
-  "version": "0.0.2-alpha.5.0",
+  "version": "0.0.2-alpha.6.0",
   "description": "True microservices framework for nodeJs ",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
