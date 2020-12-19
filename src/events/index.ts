@@ -1,1 +1,1 @@
-export { default as RedisEventStream } from './redis' 
+export { default as RedisEventStream } from './redis'
