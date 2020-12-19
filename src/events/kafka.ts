@@ -86,7 +86,7 @@ export default class KafkaEventStream implements IEventStream {
    */
   unsubscribe = (eventName: string): void => {
     // eslint-disable-next-line no-console
-    console.info("KafkaJS has no unsubscribe function so far")
+    console.log("KafkaJS has no unsubscribe function so far")
     this.listener.delete(eventName)
   }
 
