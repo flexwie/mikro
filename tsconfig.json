@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
+    "lib": [ "dom", "es5", "scripthost", "es2015.collection" ],
     "module": "commonjs",
     "declaration": true,
     "outDir": "./lib",
