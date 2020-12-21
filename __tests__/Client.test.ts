@@ -1,4 +1,4 @@
-import Mikro, { RedisEventStream } from '../src/index'
+import {Mikro, RedisEventStream } from '../src/index'
 
 test("Mikro initiates correctly", () => {
     let mikro = new Mikro("name", {
