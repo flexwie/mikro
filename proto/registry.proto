@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package registry;
+
+service Registry {
+    rpc register(RegisterCall) returns (RegisterResponse) {}
+    rpc routeRegister(RouteRegisterCall) returns (RouteRegisterResponse) {}
+    rpc discovery(DiscoveryCall) returns (DiscoveryResponse) {}
+    rpc deregister(DeregisterCall) returns (DeregisterResponse) {}
+}
+
+message RegisterCall {
+    string name = 1;
+    string type = 2;
+    string lang = 3;
+    string host = 4;
+}
+
+message RegisterResponse {
+    bool success = 1;
+    string message = 2;
+    int32 replicas = 3;
+}
+
+message RouteRegisterCall {
+    string type = 1;
+    string functionName = 2;
+    string restMethod = 3;
+}
+
+message RouteRegisterResponse {
+    bool success = 1;
+}
+
+message DiscoveryCall {
+    string type = 1;
+}
+
+message DiscoveryResponse {
+    string host = 1;
+}
+
+message DeregisterCall {
+    string type = 1;
+    string name = 2;
+    string host = 3;
+}
+
+message DeregisterResponse {}

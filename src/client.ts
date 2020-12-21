@@ -1,9 +1,15 @@
 import * as RedisClient from 'ioredis'
 import { Redis, RedisOptions } from 'ioredis'
+import { address } from 'ip'
+
+import * as grpc from '@grpc/grpc-js'
+import { RegistryClient } from './proto/registry_grpc_pb'
+
 import { uniqueNamesGenerator as uniq, adjectives, colors, animals } from 'unique-names-generator'
 import * as logger from 'winston'
 
 import IEventStream from './events/interface'
+import { DeregisterCall, RegisterCall, RegisterResponse } from './proto/registry_pb'
 
 /**
  * Options for mikro clients
@@ -23,6 +29,8 @@ export default class Mikro {
   private healthTimer: NodeJS.Timeout | undefined
   private serviceName: string
 
+  private registryClient: RegistryClient
+
   private configHolder: Record<string, string> = {}
   /**
    * Creates a new mikro base instance
@@ -35,12 +43,21 @@ export default class Mikro {
 
     this.events = opts.eventStream
 
+    process.on('SIGINT', async () => {
+      this.deregister().then(() => {
+        process.exit(0)
+      })
+    })
+
     // generate a random name for our service
     this.instanceName = uniq({
       dictionaries: [adjectives, colors, animals],
       length: 3,
       separator: '-',
     })
+
+    // generate registry client
+    this.registryClient = new RegistryClient(process.env.REGISTRY_URL || 'localhost:50051', grpc.ChannelCredentials.createInsecure())
 
     // use winston as a logging instance
     this.logging = logger.createLogger({
@@ -87,7 +104,19 @@ export default class Mikro {
    * @function
    */
   register() {
-    this.logging.log('info', `Service created with name ${this.instanceName}`)
+    let registerCall = new RegisterCall()
+    registerCall.setName(this.instanceName)
+    registerCall.setType(this.serviceName)
+    registerCall.setLang('js')
+    registerCall.setHost(`${address()}:50051`)
+    this.registryClient.register(registerCall, (err: (null | Error), value: RegisterResponse | undefined) => {
+      if(err) {
+        this.logging.error(`Service could not be registered: ${err.message}`)
+        process.exit(1)
+      }
+      this.logging.log('info', `Service created with name ${this.instanceName}`)
+    })
+
     this.healthTimer = (setInterval(() => {
       this.events.health({
         instanceName: this.instanceName,
@@ -100,12 +129,24 @@ export default class Mikro {
    * Gracefully deregisters the service. Clears health timer and notifies registry + peers.
    * @function
    */
-  deregister() {
-    if (this.healthTimer) {
-      clearInterval(this.healthTimer)
-    } else {
-      throw new Error("You can't deregister a service you haven't registered yet.")
-    }
+  deregister(): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.healthTimer) {
+        clearInterval(this.healthTimer)
+      } else {
+        throw new Error("You can't deregister a service you haven't registered yet.")
+      }
+  
+      let deregisterCall = new DeregisterCall()
+      deregisterCall.setName(this.instanceName)
+      deregisterCall.setType(this.serviceName)
+      deregisterCall.setHost(`${address()}:50051`)
+      this.registryClient.deregister(deregisterCall, () => {
+        this.registryClient.close()
+        this.logging.info('Service deregistered gracefully')
+        resolve()
+      })
+    })
   }
 
   /**
