@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>client.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">client.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
+var __assign = (this &amp;&amp; this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i &lt; n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var RedisClient = require("ioredis");
+var unique_names_generator_1 = require("unique-names-generator");
+var logger = require("winston");
+var Mikro = /** @class */ (function () {
+    /**
+     * Creates a new mikro base instance
+     * @class
+     * @param name The service name. Will be the same for each replica of this service
+     * @param opts IMikroOptions Configuration to be passed down
+     */
+    function Mikro(name, opts) {
+        var _this = this;
+        this.configHolder = {};
+        this.serviceName = name;
+        this.events = opts.eventStream;
+        this.instanceName = unique_names_generator_1.uniqueNamesGenerator({
+            dictionaries: [unique_names_generator_1.adjectives, unique_names_generator_1.colors, unique_names_generator_1.animals],
+            length: 3,
+            separator: '-',
+        });
+        this.logging = logger.createLogger({
+            level: 'info',
+            transports: [
+                new logger.transports.Console({
+                    format: logger.format.combine(logger.format.colorize(), logger.format.timestamp({
+                        format: 'YYYY-MM-DD HH:mm:ss',
+                    }), logger.format.printf(function (info) {
+                        return info.timestamp + " " + info.level + ": " + info.message + (info.splat !== undefined ? "" + info.splat : ' ');
+                    })),
+                }),
+            ],
+        });
+        this.redis = new RedisClient();
+        this.redis.hgetall("conf:" + this.serviceName, function (err, res) {
+            _this.configHolder = __assign(__assign({}, _this.configHolder), res);
+            console.log(_this.configHolder);
+        });
+        var listener = new RedisClient();
+        listener.psubscribe("__keyspace@0__:conf:" + this.serviceName);
+        listener.on("pmessage", function (p, c, m) {
+            if (m === "hset") {
+                _this.redis.hgetall("conf:" + _this.serviceName, function (err, res) {
+                    if (err)
+                        _this.logging.error(err.message);
+                    _this.configHolder = __assign(__assign({}, _this.configHolder), res);
+                    console.log(_this.configHolder);
+                });
+            }
+        });
+    }
+    /**
+     * Registers the service to the registry
+     * @function
+     */
+    Mikro.prototype.register = function () {
+        var _this = this;
+        this.logging.log('info', "Service created with name " + this.instanceName);
+        this.healthTimer = setInterval(function () {
+            _this.events.health({
+                instanceName: _this.instanceName,
+                serviceName: _this.serviceName,
+            });
+        }, 1000);
+    };
+    /**
+     * Gracefully deregisters the service. Clears health timer and notifies registry + peers.
+     * @function
+     */
+    Mikro.prototype.deregister = function () {
+        if (this.healthTimer) {
+            clearInterval(this.healthTimer);
+        }
+        else {
+            throw new Error("You can't deregister a service you haven't registered yet.");
+        }
+    };
+    Mikro.prototype.config = function (key, fallback) {
+        if (key in this.configHolder) {
+            return this.configHolder[key];
+        }
+        return fallback;
+    };
+    return Mikro;
+}());
+exports.default = Mikro;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> on Mon Dec 21 2020 10:22:14 GMT+0100 (Mitteleuropäische Normalzeit) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
