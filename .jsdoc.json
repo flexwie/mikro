@@ -1,7 +1,14 @@
 {
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc"]
+    },
     "opts": {
         "destination": "./docs/",
-        "template": "node_modules/minami"
+        "template": "node_modules/minami",
+        "encoding": "utf8",
+        "private": true,
+        "recurse": true
     },
     "recurseDepth": 10,
     "source": {
