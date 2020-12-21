@@ -1,8 +1,8 @@
-import { RedisOptions } from 'ioredis'
+import * as RedisClient from 'ioredis'
+import { Redis, RedisOptions } from 'ioredis'
 import { uniqueNamesGenerator as uniq, adjectives, colors, animals } from 'unique-names-generator'
 import * as logger from 'winston'
 
-import { RedisEventStream } from './events'
 import IEventStream from './events/interface'
 
 export interface IMikroOptions {
@@ -13,27 +13,31 @@ export default class Mikro {
   instanceName!: string
   logging!: logger.Logger
   events: IEventStream
+  redis: Redis
 
   private healthTimer: NodeJS.Timeout | undefined
   private serviceName: string
 
+  private configHolder: Record<string, string> = {}
   /**
    * Creates a new mikro base instance
    * @class
    * @param name The service name. Will be the same for each replica of this service
-   * @param opts IMikroOptions Configuration to be passed down
+   * @param opts Configuration to be passed down
    */
   constructor(name: string, opts: IMikroOptions) {
     this.serviceName = name
 
     this.events = opts.eventStream
 
+    // generate a random name for our service
     this.instanceName = uniq({
       dictionaries: [adjectives, colors, animals],
       length: 3,
       separator: '-',
     })
 
+    // use winston as a logging instance
     this.logging = logger.createLogger({
       level: 'info',
       transports: [
@@ -50,6 +54,26 @@ export default class Mikro {
           ),
         }),
       ],
+    })
+
+    // we use redis independently from our event stream for instance configuration
+    // load the configuration once on creation and then listen for events matching our key
+    this.redis = new RedisClient()
+    this.redis.hgetall(`conf:${this.serviceName}`, (err, res) => {
+      this.configHolder = {...this.configHolder, ...res}
+      this.logging.info("Configuration loaded successfully")
+    })
+
+    const listener = new RedisClient()
+    listener.psubscribe(`__keyspace@0__:conf:${this.serviceName}`)
+    listener.on("pmessage", (p, c, m) => {
+      if(m === "hset") {
+        this.redis.hgetall(`conf:${this.serviceName}`, (err, res) => {
+          if(err) this.logging.error(err.message)
+          this.logging.info("Reloading configuration...")
+          this.configHolder = {...this.configHolder, ...res}
+        })
+      }
     })
   }
 
@@ -77,5 +101,19 @@ export default class Mikro {
     } else {
       throw new Error("You can't deregister a service you haven't registered yet.")
     }
+  }
+
+  /**
+   * Interfaces the configuration object but provides a fallback
+   * @function
+   * @param key 
+   * @param fallback value to use if key is not set in configuration
+   */
+  config(key: string, fallback: any): string {
+    if(key in this.configHolder) {
+      return this.configHolder[key]
+    }
+
+    return fallback
   }
 }
