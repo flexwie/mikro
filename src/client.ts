@@ -5,6 +5,11 @@ import * as logger from 'winston'
 
 import IEventStream from './events/interface'
 
+/**
+ * Options for mikro clients
+ * @typedef {object} IMikroOptions
+ * @property {IEventStream} eventStream PubSub event stream client
+ */
 export interface IMikroOptions {
   eventStream: IEventStream
 }
@@ -21,9 +26,9 @@ export default class Mikro {
   private configHolder: Record<string, string> = {}
   /**
    * Creates a new mikro base instance
-   * @class
-   * @param name The service name. Will be the same for each replica of this service
-   * @param opts Configuration to be passed down
+   * @constructor
+   * @param {string} name The service name. Will be the same for each replica of this service
+   * @param {IMikroOptions} opts Configuration to be passed down
    */
   constructor(name: string, opts: IMikroOptions) {
     this.serviceName = name
@@ -106,8 +111,9 @@ export default class Mikro {
   /**
    * Interfaces the configuration object but provides a fallback
    * @function
-   * @param key 
-   * @param fallback value to use if key is not set in configuration
+   * @param {string} key 
+   * @param {string} fallback value to use if key is not set in configuration
+   * @returns {string}
    */
   config(key: string, fallback: any): string {
     if(key in this.configHolder) {
