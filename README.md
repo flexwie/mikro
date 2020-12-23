@@ -41,26 +41,7 @@ You can use the included CLI to quickly create a boilerplate. For more informati
 npx @flexwie/mikro new service_name
 ```
 
-`mikro` will automatically send heath metrics to the registry in the background. You can then use `mikro`s functions to help with your service. See detailed information below.
+`mikro` will automatically send health metrics to the registry in the background. You can then use `mikro`s functions to help with your service. See detailed information on usage in the wiki.
 
-### EventStream
-`mikro` features an event stream for node communication and alerting.
-
-```javascript
-// publish an event
-mikro.events.publish("testevent", {data: "test"})
-
-// add a new subscriber to an event
-mikro.events.subscribe("testevent", (err, data) => {
-    console.log(data)
-    /*
-    {
-        emitterName: "automatically-generated-name",
-        timestamp: 123456789,
-        data: "test"
-    }
-    */
-})
-```
 ## Acknowledgements
-This project is inspired by the microservice frameworks [mikro]() and [gizmo]() in the golang ecosystem and tries to bring the best parts of those and more to NodeJS.
+This project is inspired by the microservice frameworks [micro](https://github.com/micro/micro) and [gizmo](https://github.com/nytimes/gizmo) in the golang ecosystem and tries to bring the best parts of those and more to NodeJS.
