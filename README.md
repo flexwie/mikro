@@ -62,3 +62,5 @@ mikro.events.subscribe("testevent", (err, data) => {
     */
 })
 ```
+## Acknowledgements
+This project is inspired by the microservice frameworks [mikro]() and [gizmo]() in the golang ecosystem and tries to bring the best parts of those and more to NodeJS.
