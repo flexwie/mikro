@@ -1,6 +1,6 @@
-# @flexwie/mikro
+# mikro
 
-![npm (scoped)](https://img.shields.io/npm/v/@flexwie/mikro)
+![npm (scoped)](https://img.shields.io/npm/v/mikro)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/flexwie/mikro)
 ![Tests](https://github.com/fosscom/mikro/workflows/Tests/badge.svg)
 
@@ -9,12 +9,12 @@
 ## Usage
 Install the framework from npm:
 ```sh
-npm install --save @flexwie/mikro
+npm install --save mikro
 ```
 
 Then use it in your microservice like so:
 ```javascript
-const { Mikro } = require('@flexwie/mikro')
+const { Mikro } = require('mikro')
 
 /*
 create a new instance and configure it (optional)
@@ -38,7 +38,7 @@ mikro.register()
 You can use the included CLI to quickly create a boilerplate. For more information see the [CLI Readme](/cli).
 
 ```
-npx @flexwie/mikro new service_name
+npx mikro new service_name
 ```
 
 `mikro` will automatically send health metrics to the registry in the background. You can then use `mikro`s functions to help with your service. See detailed information on usage in the wiki.
